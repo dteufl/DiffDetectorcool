@@ -1,0 +1,111 @@
+@* ============================================================
+   Register.cshtml  –  Registrierungs-Formular
+   Neuen Account erstellen mit Username + Passwort (2x)
+   ============================================================ *@
+@model DiffDetector.Models.RegisterViewModel
+@{
+    ViewData["Title"] = "Registrieren";
+
+    @* Eigenes Layout ohne Navbar, gleich wie Login *@
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registrieren – DiffDetector</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        .auth-wrap {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .auth-card {
+            width: 100%;
+            max-width: 420px;
+            background: var(--surface);
+            border: 1px solid var(--border-g);
+            border-radius: 4px;
+            padding: 2.5rem;
+            position: relative;
+        }
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .auth-logo h1 { font-size: 2rem; margin-bottom: 0.3rem; }
+        .auth-logo p  { color: var(--text-dim); font-size: 0.85rem; letter-spacing: 0.1em; }
+        .auth-link {
+            text-align: center;
+            margin-top: 1.2rem;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+        .auth-link a { color: var(--gold); text-decoration: none; }
+        .auth-link a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="auth-wrap">
+    <div class="auth-card">
+
+        <div class="auth-logo">
+            <h1>⚔ <span class="diff">Diff</span>Detector</h1>
+            <p>NEUEN ACCOUNT ERSTELLEN</p>
+        </div>
+
+        @* asp-action="Register" → Formular wird an POST /Account/Register geschickt *@
+        <form asp-action="Register" method="post">
+            @Html.AntiForgeryToken()
+
+            @* Zeigt allgemeine Fehler an (z.B. "Benutzername bereits vergeben") *@
+            <div asp-validation-summary="All" class="val-sum"></div>
+
+            @* Benutzername *@
+            <div class="fg" style="margin-bottom:1rem;">
+                <label asp-for="Username" class="fl"></label>
+                <input asp-for="Username" class="fc" placeholder="3–50 Zeichen" autocomplete="username" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+
+            @* Passwort *@
+            <div class="fg" style="margin-bottom:1rem;">
+                <label asp-for="Password" class="fl"></label>
+                <input asp-for="Password" class="fc" type="password" placeholder="Mindestens 6 Zeichen" autocomplete="new-password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            @* Passwort bestätigen: muss identisch sein ([Compare] im ViewModel prüft das) *@
+            <div class="fg" style="margin-bottom:1.5rem;">
+                <label asp-for="ConfirmPassword" class="fl"></label>
+                <input asp-for="ConfirmPassword" class="fc" type="password" placeholder="Passwort wiederholen" autocomplete="new-password" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-gold" style="width:100%;justify-content:center;">
+                Account erstellen
+            </button>
+        </form>
+
+        @* Link zurück zum Login *@
+        <div class="auth-link">
+            Bereits einen Account?
+            <a asp-controller="Account" asp-action="Login">Einloggen</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

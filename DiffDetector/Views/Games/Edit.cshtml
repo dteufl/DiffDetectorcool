@@ -1,0 +1,72 @@
+@model DiffDetector.Models.GameEntry
+@{
+    ViewData["Title"] = "Spiel bearbeiten";
+    var lanes = new[] { "Top", "Jungle", "Mid", "Bot / ADC", "Support" };
+    var modes = new[] { "Ranked Solo/Duo", "Ranked Flex", "Normal Draft", "ARAM", "Sonstiges" };
+}
+
+<div class="page-header">
+    <h1>✏ Spiel bearbeiten</h1>
+    <a asp-action="Index" class="btn btn-out">← Zurück</a>
+</div>
+
+<div class="card" style="max-width:820px;">
+    <form asp-action="Edit" method="post">
+        <div asp-validation-summary="ModelOnly" class="val-sum"></div>
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="PlayedAt" />
+
+        <div class="form-grid">
+            <div class="fg">
+                <label asp-for="Champion" class="fl"></label>
+                <input asp-for="Champion" class="fc" />
+                <span asp-validation-for="Champion" class="text-danger"></span>
+            </div>
+            <div class="fg">
+                <label asp-for="Lane" class="fl"></label>
+                <select asp-for="Lane" class="fs">
+                    @foreach (var l in lanes) { <option value="@l">@l</option> }
+                </select>
+            </div>
+            <div class="fg">
+                <label class="fl">Ergebnis</label>
+                <div class="res-toggle">
+                    <input type="radio" name="Won" id="r-win"  value="true"  @(Model.Won  ? "checked" : "") />
+                    <label for="r-win">WIN</label>
+                    <input type="radio" name="Won" id="r-loss" value="false" @(!Model.Won ? "checked" : "") />
+                    <label for="r-loss">LOSS</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-grid">
+            <div class="fg">
+                <label asp-for="EnemyChampion" class="fl"></label>
+                <input asp-for="EnemyChampion" class="fc" />
+                <span asp-validation-for="EnemyChampion" class="text-danger"></span>
+            </div>
+            <div class="fg">
+                <label asp-for="GameMode" class="fl"></label>
+                <select asp-for="GameMode" class="fs">
+                    @foreach (var m in modes) { <option value="@m">@m</option> }
+                </select>
+            </div>
+        </div>
+
+        <div class="form-3col">
+            <div class="fg"><label asp-for="Kills"   class="fl"></label><input asp-for="Kills"   class="fc" type="number" min="0" max="50" /></div>
+            <div class="fg"><label asp-for="Deaths"  class="fl"></label><input asp-for="Deaths"  class="fc" type="number" min="0" max="50" /></div>
+            <div class="fg"><label asp-for="Assists" class="fl"></label><input asp-for="Assists" class="fc" type="number" min="0" max="50" /></div>
+        </div>
+
+        <div class="fg" style="margin-bottom:1.4rem;">
+            <label asp-for="Notes" class="fl"></label>
+            <textarea asp-for="Notes" class="fc" rows="2"></textarea>
+        </div>
+
+        <div style="display:flex;gap:.7rem;">
+            <button type="submit" class="btn btn-gold">Speichern</button>
+            <a asp-action="Index" class="btn btn-out">Abbrechen</a>
+        </div>
+    </form>
+</div>

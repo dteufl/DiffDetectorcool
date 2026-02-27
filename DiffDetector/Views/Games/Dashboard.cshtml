@@ -1,0 +1,153 @@
+@model DiffDetector.Models.DashboardViewModel
+@{ ViewData["Title"] = "Dashboard"; }
+
+<div class="page-header">
+    <h1>⚔ Dashboard</h1>
+    <div style="display:flex;gap:.7rem;align-items:center;flex-wrap:wrap;">
+        @if (Model.TotalGames > 0)
+        {
+            var sc = Model.StreakIsWin ? "streak streak-win" : "streak streak-loss";
+            var sl = Model.StreakIsWin ? "WIN STREAK" : "LOSS STREAK";
+            <span class="@sc">@Model.CurrentStreak × @sl</span>
+        }
+        <a asp-action="Create" class="btn btn-gold">+ Runde eintragen</a>
+    </div>
+</div>
+
+@if (Model.TotalGames == 0)
+{
+    <div class="empty">
+        <div class="empty-icon">🎮</div>
+        <h3>Noch keine Runden eingetragen</h3>
+        <p style="margin-bottom:1.5rem;">Track deine ersten Games und sieh deine Winrate!</p>
+        <a asp-action="Create" class="btn btn-gold">Erste Runde eintragen</a>
+    </div>
+}
+else
+{
+    <div class="stats-grid">
+        <div class="stat-box">
+            <div class="stat-val">@Model.TotalGames</div>
+            <div class="stat-lbl">Runden (letzte 100)</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-val @(Model.OverallWinRate >= 50 ? "c-win" : "c-loss")">
+                @Model.OverallWinRate<small style="font-size:1rem">%</small>
+            </div>
+            <div class="stat-lbl">Gesamt Winrate</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-val c-win">@Model.ChampionStats.Sum(c => c.Wins)</div>
+            <div class="stat-lbl">Siege</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-val c-loss">@Model.ChampionStats.Sum(c => c.Losses)</div>
+            <div class="stat-lbl">Niederlagen</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-val sm">@Model.MostPlayedChampion</div>
+            <div class="stat-lbl">Meist gespielt</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-val sm c-win">@Model.BestChampion</div>
+            <div class="stat-lbl">Bester Champ (≥3)</div>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="card">
+            <div class="sec-hdr"><div class="sec-line"></div><h2>Champion Winrates</h2></div>
+            <table class="lol-table">
+                <thead><tr><th>Champion</th><th>G</th><th>W / L</th><th>Winrate</th><th>KDA</th></tr></thead>
+                <tbody>
+                    @foreach (var c in Model.ChampionStats)
+                    {
+                        var fc = c.WinRate >= 55 ? "high" : c.WinRate < 45 ? "low" : "";
+                        var wc = c.WinRate >= 50 ? "var(--win)" : "var(--loss)";
+                        <tr>
+                            <td class="champ">@c.Champion</td>
+                            <td class="dim">@c.Games</td>
+                            <td><span style="color:var(--win)">@c.Wins</span><span class="dim"> / </span><span style="color:var(--loss)">@c.Losses</span></td>
+                            <td>
+                                <div class="wr-bar"><div class="wr-fill @fc" style="width:@c.WinRate%"></div></div>
+                                <span style="color:@wc">@c.WinRate%</span>
+                            </td>
+                            <td class="kda">@c.KDA</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="card">
+            <div class="sec-hdr"><div class="sec-line"></div><h2>Letzte 10 Spiele</h2></div>
+            <table class="lol-table">
+                <thead><tr><th>Res</th><th>Champ</th><th>Gegner</th><th>Lane</th><th>KDA</th></tr></thead>
+                <tbody>
+                    @foreach (var g in Model.RecentGames)
+                    {
+                        <tr>
+                            <td>@if(g.Won){<span class="badge badge-win">W</span>}else{<span class="badge badge-loss">L</span>}</td>
+                            <td class="champ">@g.Champion</td>
+                            <td class="dim">@g.EnemyChampion</td>
+                            <td><span class="lane-pill">@g.Lane</span></td>
+                            <td class="kda">@g.Kills/@g.Deaths/@g.Assists</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="card">
+            <div class="sec-hdr"><div class="sec-line green"></div><h2>Beste Matchups</h2><span class="sec-note">min. 2 Spiele</span></div>
+            @if (!Model.BestMatchups.Any()) { <p class="dim" style="font-size:.85rem">Noch zu wenig Daten.</p> }
+            else {
+                <table class="lol-table">
+                    <thead><tr><th>Champ</th><th>vs</th><th>W/L</th><th>WR</th></tr></thead>
+                    <tbody>
+                        @foreach (var m in Model.BestMatchups) {
+                            <tr>
+                                <td class="champ">@m.Champion</td><td class="dim">@m.EnemyChampion</td>
+                                <td><span style="color:var(--win)">@m.Wins</span>/<span style="color:var(--loss)">@m.Losses</span></td>
+                                <td style="color:var(--win);font-weight:700">@m.WinRate%</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+        <div class="card">
+            <div class="sec-hdr"><div class="sec-line red"></div><h2>Schlechteste Matchups</h2><span class="sec-note">min. 2 Spiele</span></div>
+            @if (!Model.WorstMatchups.Any()) { <p class="dim" style="font-size:.85rem">Noch zu wenig Daten.</p> }
+            else {
+                <table class="lol-table">
+                    <thead><tr><th>Champ</th><th>vs</th><th>W/L</th><th>WR</th></tr></thead>
+                    <tbody>
+                        @foreach (var m in Model.WorstMatchups) {
+                            <tr>
+                                <td class="champ">@m.Champion</td><td class="dim">@m.EnemyChampion</td>
+                                <td><span style="color:var(--win)">@m.Wins</span>/<span style="color:var(--loss)">@m.Losses</span></td>
+                                <td style="color:var(--loss);font-weight:700">@m.WinRate%</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="sec-hdr"><div class="sec-line"></div><h2>Lane Winrates</h2></div>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+            @foreach (var l in Model.LaneStats) {
+                var lc = l.WinRate >= 50 ? "c-win" : "c-loss";
+                <div class="stat-box" style="min-width:130px;flex:1;">
+                    <div class="stat-val @lc" style="font-size:1.5rem">@l.WinRate<small style="font-size:.85rem">%</small></div>
+                    <div style="color:var(--gold);font-weight:700;margin-top:.2rem">@l.Lane</div>
+                    <div class="stat-lbl">@l.Games Spiele / @l.Wins Siege</div>
+                </div>
+            }
+        </div>
+    </div>
+}

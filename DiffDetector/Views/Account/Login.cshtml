@@ -1,0 +1,138 @@
+@* ============================================================
+   Login.cshtml  –  Login-Formular
+   @model = das ViewModel das der Controller an diese View übergibt
+   LoginViewModel enthält Username und Passwort Felder
+   ============================================================ *@
+@model DiffDetector.Models.LoginViewModel
+@{
+    @* ViewData["Title"] = Seitentitel, wird im <title> Tag in _Layout.cshtml eingesetzt *@
+    ViewData["Title"] = "Login";
+
+    @* Login/Register Seiten brauchen kein Navbar-Layout → eigenes simples Layout *@
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login – DiffDetector</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        /* Zentriert die Login-Box auf dem Bildschirm */
+        .auth-wrap {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        /* Die Login-Karte selbst */
+        .auth-card {
+            width: 100%;
+            max-width: 420px;
+            background: var(--surface);
+            border: 1px solid var(--border-g);
+            border-radius: 4px;
+            padding: 2.5rem;
+            position: relative;
+        }
+        /* Goldene Linie oben auf der Karte */
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+        /* Logo/Titel in der Mitte */
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .auth-logo h1 {
+            font-size: 2rem;
+            margin-bottom: 0.3rem;
+        }
+        .auth-logo p {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+        }
+        /* Link-Zeile unter dem Formular */
+        .auth-link {
+            text-align: center;
+            margin-top: 1.2rem;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+        .auth-link a {
+            color: var(--gold);
+            text-decoration: none;
+        }
+        .auth-link a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="auth-wrap">
+    <div class="auth-card">
+
+        @* Logo und Titel *@
+        <div class="auth-logo">
+            <h1>⚔ <span class="diff">Diff</span>Detector</h1>
+            <p>LEAGUE OF LEGENDS WINRATE TRACKER</p>
+        </div>
+
+        @* TempData["Success"] = Erfolgsmeldung nach der Registrierung *@
+        @if (TempData["Success"] is string msg)
+        {
+            <div class="alert-success" style="margin-bottom:1.2rem;">✓ @msg</div>
+        }
+
+        @* asp-action="Login" → das Formular wird an POST /Account/Login geschickt *@
+        <form asp-action="Login" method="post">
+
+            @* AntiForgeryToken = verstecktes Sicherheitsfeld gegen CSRF-Angriffe
+               wird automatisch von [ValidateAntiForgeryToken] im Controller geprüft *@
+            @Html.AntiForgeryToken()
+
+            @* asp-validation-summary zeigt Fehler die nicht zu einem bestimmten Feld gehören
+               z.B. "Benutzername oder Passwort falsch" *@
+            <div asp-validation-summary="All" class="val-sum"></div>
+
+            @* Username-Feld *@
+            <div class="fg" style="margin-bottom:1rem;">
+                @* asp-for="Username" verbindet das Label mit dem Input-Feld (für Klick) *@
+                <label asp-for="Username" class="fl"></label>
+                @* asp-for auf dem Input = befüllt name, id, value automatisch aus dem Model *@
+                <input asp-for="Username" class="fc" placeholder="Dein Benutzername" autocomplete="username" />
+                @* asp-validation-for zeigt die Fehlermeldung für dieses spezifische Feld an *@
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+
+            @* Passwort-Feld *@
+            <div class="fg" style="margin-bottom:1.5rem;">
+                <label asp-for="Password" class="fl"></label>
+                @* type="password" = Browser zeigt Punkte statt Buchstaben *@
+                <input asp-for="Password" class="fc" type="password" placeholder="••••••••" autocomplete="current-password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            @* Submit-Button: schickt das Formular ab *@
+            <button type="submit" class="btn btn-gold" style="width:100%;justify-content:center;">
+                Einloggen
+            </button>
+        </form>
+
+        @* Link zur Registrierung *@
+        <div class="auth-link">
+            Noch kein Account?
+            @* asp-controller / asp-action = generiert automatisch die korrekte URL *@
+            <a asp-controller="Account" asp-action="Register">Jetzt registrieren</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

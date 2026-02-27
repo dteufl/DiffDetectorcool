@@ -1,0 +1,83 @@
+@model IEnumerable<DiffDetector.Models.GameEntry>
+@{
+    ViewData["Title"] = "Spielhistorie";
+    var lanes = new[] { "Top", "Jungle", "Mid", "Bot / ADC", "Support" };
+}
+
+<div class="page-header">
+    <h1>🕹 Spielhistorie</h1>
+    <a asp-action="Create" class="btn btn-gold">+ Runde eintragen</a>
+</div>
+
+<div class="filter-card">
+    <form method="get" asp-action="Index">
+        <div class="filter-row">
+            <div class="fg" style="min-width:170px;">
+                <label class="fl">Champion</label>
+                <input name="champion" class="fc" value="@ViewBag.FilterChampion" placeholder="z.B. Jinx" />
+            </div>
+            <div class="fg" style="min-width:140px;">
+                <label class="fl">Lane</label>
+                <select name="lane" class="fs">
+                    <option value="">Alle</option>
+                    @foreach (var l in lanes) { <option value="@l" selected="@(ViewBag.FilterLane==l?"selected":null)">@l</option> }
+                </select>
+            </div>
+            <div class="fg" style="min-width:120px;">
+                <label class="fl">Ergebnis</label>
+                <select name="result" class="fs">
+                    <option value="">Alle</option>
+                    <option value="win"  selected="@(ViewBag.FilterResult=="win" ?"selected":null)">WIN</option>
+                    <option value="loss" selected="@(ViewBag.FilterResult=="loss"?"selected":null)">LOSS</option>
+                </select>
+            </div>
+            <div style="display:flex;gap:.5rem;align-items:flex-end;">
+                <button type="submit" class="btn btn-out">Filtern</button>
+                <a asp-action="Index" class="btn btn-out">Reset</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="empty">
+        <div class="empty-icon">🔍</div>
+        <h3>Keine Spiele gefunden</h3>
+        <p>Andere Filter wählen oder neue Runde eintragen.</p>
+    </div>
+}
+else
+{
+    <div class="card">
+        <table class="lol-table">
+            <thead>
+                <tr><th>#</th><th>Res</th><th>Champion</th><th>Lane</th><th>Gegner</th><th>KDA</th><th>Modus</th><th>Datum</th><th></th></tr>
+            </thead>
+            <tbody>
+                @{ int i = 1; }
+                @foreach (var g in Model)
+                {
+                    <tr>
+                        <td class="dim" style="font-size:.78rem">@i</td>
+                        <td>@if(g.Won){<span class="badge badge-win">WIN</span>}else{<span class="badge badge-loss">LOSS</span>}</td>
+                        <td class="champ">@g.Champion</td>
+                        <td><span class="lane-pill">@g.Lane</span></td>
+                        <td class="dim">vs @g.EnemyChampion</td>
+                        <td class="kda">@g.Kills/@g.Deaths/@g.Assists</td>
+                        <td class="dim" style="font-size:.78rem">@g.GameMode</td>
+                        <td class="dim" style="font-size:.78rem">@g.PlayedAt.ToString("dd.MM.yy")</td>
+                        <td>
+                            <div style="display:flex;gap:.3rem;">
+                                <a asp-action="Edit"   asp-route-id="@g.Id" class="btn btn-out btn-sm">✏</a>
+                                <a asp-action="Delete" asp-route-id="@g.Id" class="btn btn-red btn-sm">✕</a>
+                            </div>
+                        </td>
+                    </tr>
+                    i++;
+                }
+            </tbody>
+        </table>
+    </div>
+    <p class="dim" style="font-size:.78rem;text-align:right;margin-top:.6rem;">@Model.Count() Spiele (max. 100)</p>
+}

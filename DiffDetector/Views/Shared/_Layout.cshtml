@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] – DiffDetector</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+
+<nav class="navbar">
+    <a class="navbar-brand" asp-controller="Games" asp-action="Dashboard">
+        ⚔ <span class="diff">Diff</span>Detector
+    </a>
+    <ul class="nav-links">
+        <li>
+            <a asp-controller="Games" asp-action="Dashboard"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")">
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <a asp-controller="Games" asp-action="Index"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">
+                Spiele
+            </a>
+        </li>
+        <li>
+            <a asp-controller="Games" asp-action="Create"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Create" ? "active" : "")">
+                + Runde
+            </a>
+        </li>
+    </ul>
+
+    @* Rechte Seite der Navbar: eingeloggter Benutzername + Logout-Button *@
+    @* User.Identity.IsAuthenticated = true wenn ein gültiges Cookie vorhanden ist *@
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <div style="display:flex;align-items:center;gap:1rem;">
+            @* User.Identity.Name = der Benutzername aus dem Cookie-Claim *@
+            <span style="color:var(--text-dim);font-size:.82rem;letter-spacing:.1em;">
+                👤 @User.Identity.Name
+            </span>
+            @* Logout als POST-Formular (kein GET-Link!) um CSRF zu verhindern *@
+            <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0;">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-out" style="padding:.3rem .8rem;font-size:.72rem;">
+                    Logout
+                </button>
+            </form>
+        </div>
+    }</nav>
+
+<div class="main-container">
+    @if (TempData["Success"] is string msg)
+    {
+        <div class="alert-success">✓ @msg</div>
+    }
+    @RenderBody()
+</div>
+
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

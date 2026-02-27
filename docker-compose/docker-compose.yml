@@ -1,0 +1,11 @@
+services:
+  diffdetector:
+    image: ${DOCKER_REGISTRY-}diffdetector
+    build:
+      context: ../DiffDetector
+      dockerfile: Dockerfile
+    volumes:
+      - diffdetector_data:/app/data
+
+volumes:
+  diffdetector_data:

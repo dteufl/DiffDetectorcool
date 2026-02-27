@@ -1,0 +1,27 @@
+@model DiffDetector.Models.GameEntry
+@{ ViewData["Title"] = "Spiel löschen"; }
+
+<div class="page-header">
+    <h1>🗑 Spiel löschen</h1>
+    <a asp-action="Index" class="btn btn-out">← Zurück</a>
+</div>
+
+<div class="card" style="max-width:480px;">
+    <div class="danger-box">⚠ Willst du dieses Spiel wirklich löschen?</div>
+    <dl class="dl-row">
+        <dt>Ergebnis</dt>
+        <dd>@if(Model.Won){<span class="badge badge-win">WIN</span>}else{<span class="badge badge-loss">LOSS</span>}</dd>
+        <dt>Champion</dt><dd class="champ">@Model.Champion</dd>
+        <dt>Gegner</dt><dd>@Model.EnemyChampion</dd>
+        <dt>Lane</dt><dd><span class="lane-pill">@Model.Lane</span></dd>
+        <dt>KDA</dt><dd class="kda">@Model.Kills/@Model.Deaths/@Model.Assists</dd>
+        <dt>Datum</dt><dd class="dim">@Model.PlayedAt.ToString("dd.MM.yyyy")</dd>
+    </dl>
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Id" />
+        <div style="display:flex;gap:.7rem;">
+            <button type="submit" class="btn btn-red">Ja, löschen</button>
+            <a asp-action="Index" class="btn btn-out">Abbrechen</a>
+        </div>
+    </form>
+</div>
