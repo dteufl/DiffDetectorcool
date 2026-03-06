@@ -6,7 +6,7 @@
 // Importiert Entity Framework Core → wird für die Datenbankverbindung gebraucht
 using Microsoft.EntityFrameworkCore;
 
-// Importiert unseren eigenen DbContext (Datenbankverbindung)
+// Importiert unseren eigenen DbContext (Datenbankverbindung)a
 using DiffDetector.Data;
 
 // Erstellt den "Builder" – sammelt alle Einstellungen bevor die App startet
